@@ -1,7 +1,9 @@
+import csv
+import io
 import json
 import os
 import random
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, make_response, render_template, request
 
 app = Flask(__name__)
 
@@ -93,6 +95,37 @@ def get_quotes():
         'limit': limit,
         'total_pages': total_pages
     })
+
+@app.route('/api/quotes/export', methods=['GET'])
+def export_quotes():
+    query = request.args.get('search', '').strip().lower()
+    category = request.args.get('category', '').strip().lower()
+    author = request.args.get('author', '').strip().lower()
+
+    filtered = quotes_data
+
+    if category:
+        filtered = [q for q in filtered if q['category'].lower() == category]
+
+    if author:
+        filtered = [q for q in filtered if author in q['author'].lower()]
+
+    if query:
+        filtered = [
+            q for q in filtered
+            if query in q['quote'].lower() or query in q['author'].lower() or query in q['category'].lower()
+        ]
+
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['ID', 'Quote', 'Author', 'Category'])
+    for q in filtered:
+        writer.writerow([q.get('id', ''), q.get('quote', ''), q.get('author', ''), q.get('category', '')])
+
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=famous_quotes.csv'
+    response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

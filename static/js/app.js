@@ -40,6 +40,7 @@ const elements = {
     btnClearSearch: document.getElementById('btn-clear-search'),
     filterCategory: document.getElementById('filter-category'),
     filterAuthor: document.getElementById('filter-author'),
+    btnExportCsv: document.getElementById('btn-export-csv'),
     btnResetFilters: document.getElementById('btn-reset-filters'),
     btnEmptyReset: document.getElementById('btn-empty-reset'),
     
@@ -65,8 +66,8 @@ function showToast(message = 'Copied to clipboard!') {
     }, 2400);
 }
 
-// Utility: Copy text to clipboard
-async function copyToClipboard(text) {
+// Utility: Copy text to clipboard with button feedback
+async function copyToClipboard(text, triggerBtn = null) {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(text);
@@ -81,11 +82,40 @@ async function copyToClipboard(text) {
             document.execCommand('copy');
             document.body.removeChild(textArea);
         }
+        
+        if (triggerBtn) {
+            const originalText = triggerBtn.innerHTML;
+            triggerBtn.innerHTML = '✓';
+            triggerBtn.classList.add('btn-copied');
+            setTimeout(() => {
+                triggerBtn.innerHTML = originalText;
+                triggerBtn.classList.remove('btn-copied');
+            }, 1800);
+        }
+
         showToast('Quote copied to clipboard! 📋');
     } catch (err) {
         console.error('Failed to copy: ', err);
         showToast('Failed to copy quote');
     }
+}
+
+// Utility: Export current quote list to CSV
+function exportToCSV() {
+    const params = new URLSearchParams();
+    if (state.search) params.append('search', state.search);
+    if (state.category) params.append('category', state.category);
+    if (state.author) params.append('author', state.author);
+
+    const exportUrl = `/api/quotes/export?${params.toString()}`;
+    const link = document.createElement('a');
+    link.href = exportUrl;
+    link.setAttribute('download', 'famous_quotes.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Exporting quotes to CSV... 📥');
 }
 
 // Utility: Debounce function for search
@@ -299,7 +329,7 @@ function renderQuotesGrid(quotes, totalCount) {
 
         const copyBtn = card.querySelector('.btn-card-copy');
         copyBtn.addEventListener('click', () => {
-            copyToClipboard(`"${item.quote}" — ${item.author}`);
+            copyToClipboard(`"${item.quote}" — ${item.author}`, copyBtn);
         });
 
         elements.quotesGrid.appendChild(card);
@@ -375,12 +405,17 @@ function setupEventListeners() {
     // Copy Spotlight
     elements.btnCopySpotlight.addEventListener('click', () => {
         if (state.currentSpotlight) {
-            copyToClipboard(`"${state.currentSpotlight.quote}" — ${state.currentSpotlight.author}`);
+            copyToClipboard(`"${state.currentSpotlight.quote}" — ${state.currentSpotlight.author}`, elements.btnCopySpotlight);
         }
     });
 
     // Text to Speech
     elements.btnListen.addEventListener('click', speakCurrentQuote);
+
+    // Export to CSV
+    if (elements.btnExportCsv) {
+        elements.btnExportCsv.addEventListener('click', exportToCSV);
+    }
 
     // Search input with debounce
     const handleSearch = debounce((e) => {

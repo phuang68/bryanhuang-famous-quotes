@@ -95,3 +95,23 @@ def test_pagination(client):
     assert data['limit'] == 5
     assert data['total'] == 100
     assert data['total_pages'] == 20
+
+def test_export_quotes_csv_all(client):
+    response = client.get('/api/quotes/export')
+    assert response.status_code == 200
+    assert 'text/csv' in response.headers.get('Content-Type', '')
+    assert 'attachment; filename=famous_quotes.csv' in response.headers.get('Content-Disposition', '')
+    lines = response.data.decode('utf-8').strip().split('\r\n')
+    if len(lines) == 1:
+        lines = response.data.decode('utf-8').strip().split('\n')
+    assert lines[0] == 'ID,Quote,Author,Category'
+    # 1 header + 100 rows
+    assert len(lines) == 101
+
+def test_export_quotes_csv_filtered(client):
+    response = client.get('/api/quotes/export?category=Science&search=Einstein')
+    assert response.status_code == 200
+    content = response.data.decode('utf-8')
+    assert 'Albert Einstein' in content
+    assert 'Science' in content
+
