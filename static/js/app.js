@@ -340,16 +340,17 @@ function renderQuotesGrid(quotes, totalCount) {
     quotes.forEach(item => {
         const card = document.createElement('article');
         card.className = 'quote-card';
+        const searchQuery = state.search || state.author;
         card.innerHTML = `
             <div class="quote-card-header">
-                <span class="quote-badge">${escapeHtml(item.category)}</span>
+                <span class="quote-badge">${highlightMatch(item.category, state.search)}</span>
                 <button class="icon-btn btn-card-copy" title="Copy Quote" aria-label="Copy Quote">
                     📋
                 </button>
             </div>
             <div class="quote-card-body">
-                <p class="card-quote-text">“${escapeHtml(item.quote)}”</p>
-                <cite class="card-quote-author">— ${escapeHtml(item.author)}</cite>
+                <p class="card-quote-text">“${highlightMatch(item.quote, searchQuery)}”</p>
+                <cite class="card-quote-author">— ${highlightMatch(item.author, searchQuery)}</cite>
             </div>
             <div class="quote-card-footer">
                 <a class="icon-btn" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${item.quote}" — ${item.author}`)}" target="_blank" rel="noopener noreferrer" title="Share on Twitter">
@@ -380,14 +381,32 @@ function renderPagination(data) {
     elements.btnNextPage.disabled = data.page >= data.total_pages;
 }
 
+// Helper: Escape Regex Special Characters
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Helper: Escape HTML
 function escapeHtml(str) {
-    return str
+    if (!str) return '';
+    return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// Helper: Highlight matching search query
+function highlightMatch(text, query) {
+    if (!text) return '';
+    const safeText = escapeHtml(text);
+    const trimmedQuery = (query || '').trim();
+    if (!trimmedQuery) return safeText;
+
+    const escapedQuery = escapeHtml(trimmedQuery);
+    const regex = new RegExp(`(${escapeRegExp(escapedQuery)})`, 'gi');
+    return safeText.replace(regex, '<mark class="search-highlight">$1</mark>');
 }
 
 // Speech Synthesis

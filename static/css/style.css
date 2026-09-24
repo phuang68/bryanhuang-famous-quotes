@@ -696,6 +696,36 @@ main {
     gap: 8px;
 }
 
+/* Search Keyword Highlighting */
+.search-highlight {
+    background: rgba(245, 158, 11, 0.28);
+    color: #fef08a;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.45);
+    display: inline;
+}
+
+[data-theme="light"] .search-highlight {
+    background: rgba(245, 158, 11, 0.35);
+    color: #92400e;
+    box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.5);
+}
+
+.quote-badge .search-highlight {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+[data-theme="light"] .quote-badge .search-highlight {
+    background: rgba(79, 70, 229, 0.25);
+    color: #3730a3;
+    box-shadow: none;
+}
+
 /* Empty State */
 .empty-state {
     text-align: center;
