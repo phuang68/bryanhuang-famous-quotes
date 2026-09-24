@@ -13,7 +13,8 @@ A modern, responsive, and performant web application built with **Python (Flask)
 - **🔊 Text-to-Speech (Web Speech API)**: Native browser speech synthesis to read quotes aloud.
 - **📋 Copy to Clipboard**: 1-click clipboard copying with fallback support and animated toast notifications.
 - **𝕏 Social Sharing**: Share quotes directly to 𝕏 (formerly Twitter) with pre-formatted quote and author text.
-- **📱 Responsive Dark Theme**: Designed with custom CSS variables, glassmorphism card elements, glowing backdrop gradients, and mobile-first layouts.
+- **🌓 Light & Dark Mode Toggle**: Header switch overriding CSS root variables with instant theme swapping and persistent `localStorage` preference.
+- **📱 Responsive Layout**: Designed with custom CSS variables, glassmorphism card elements, glowing backdrop gradients, and mobile-first layouts.
 
 ---
 

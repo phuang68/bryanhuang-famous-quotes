@@ -43,6 +43,7 @@ const elements = {
     btnExportCsv: document.getElementById('btn-export-csv'),
     btnResetFilters: document.getElementById('btn-reset-filters'),
     btnEmptyReset: document.getElementById('btn-empty-reset'),
+    themeToggle: document.getElementById('theme-toggle'),
     
     // Grid & Pagination
     quotesGrid: document.getElementById('quotes-grid'),
@@ -64,6 +65,36 @@ function showToast(message = 'Copied to clipboard!') {
     setTimeout(() => {
         elements.toast.classList.remove('show');
     }, 2400);
+}
+
+// Theme Management (Dark / Light Mode)
+function initTheme() {
+    const savedTheme = localStorage.getItem('quotes_theme');
+    if (savedTheme) {
+        setTheme(savedTheme, false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        setTheme('light', false);
+    } else {
+        setTheme('dark', false);
+    }
+}
+
+function setTheme(theme, notify = true) {
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem('quotes_theme', theme);
+    if (notify) {
+        showToast(theme === 'light' ? 'Switched to Light Mode ☀️' : 'Switched to Dark Mode 🌙');
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme, true);
 }
 
 // Utility: Copy text to clipboard with button feedback
@@ -412,6 +443,11 @@ function setupEventListeners() {
     // Text to Speech
     elements.btnListen.addEventListener('click', speakCurrentQuote);
 
+    // Theme toggle
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', toggleTheme);
+    }
+
     // Export to CSV
     if (elements.btnExportCsv) {
         elements.btnExportCsv.addEventListener('click', exportToCSV);
@@ -478,6 +514,7 @@ function setupEventListeners() {
 
 // Application Initialization
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     setupEventListeners();
     fetchStats();
     fetchFilterOptions();

@@ -8,6 +8,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        (function() {
+            var theme = localStorage.getItem('quotes_theme');
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                theme = 'light';
+            }
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="background-decorations">
@@ -24,10 +35,19 @@
                     <span class="subtitle">100 Timeless Words of Wisdom</span>
                 </div>
             </div>
-            <div class="header-stats" id="header-stats">
-                <div class="stat-pill"><span id="stat-quotes">100</span> Quotes</div>
-                <div class="stat-pill"><span id="stat-categories">--</span> Categories</div>
-                <div class="stat-pill"><span id="stat-authors">--</span> Authors</div>
+            <div class="header-right">
+                <div class="header-stats" id="header-stats">
+                    <div class="stat-pill"><span id="stat-quotes">100</span> Quotes</div>
+                    <div class="stat-pill"><span id="stat-categories">--</span> Categories</div>
+                    <div class="stat-pill"><span id="stat-authors">--</span> Authors</div>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark Mode" aria-label="Toggle Light/Dark theme">
+                    <span class="theme-toggle-track">
+                        <span class="theme-icon theme-icon-moon" aria-hidden="true">🌙</span>
+                        <span class="theme-icon theme-icon-sun" aria-hidden="true">☀️</span>
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                </button>
             </div>
         </div>
     </header>
